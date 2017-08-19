@@ -14,22 +14,29 @@ import java.nio.file.Paths;
 public class Poetry {
 
     public static void main(String[] args) throws IOException {
-        new Poetry().compose();
+        if(args.length<4) {
+            System.out.println("Expecting these arguments:");
+            System.out.println("- package name");
+            System.out.println("- class name");
+            System.out.println("- project root location");
+            System.out.println("- code source folder");
+            System.out.println("- test source folder");
+            return;
+        }
+        String packageName = args[0];
+        String className = args[1];
+
+        String root = args[2];
+        String codeSourceFolder = root + args[3];
+        String testSourceFolder = root + args[4];
+        new Poetry().compose(packageName, className, codeSourceFolder, testSourceFolder);
     }
 
-
-    private void compose() throws IOException {
-        String packageName = "com.tegeltech.tmp";
-        String className = "Calculator";
-
-        String root = "C:/git/java/MutationTestingExperiment/";
-        String codeSourceFolder = root + "src/main/java";
-        String testSourceFolder = root + "src/test/java";
+    private void compose(String packageName, String className, String codeSourceFolder, String testSourceFolder) throws IOException {
         for (int i = 0; i < 10; i++) {
             details(packageName, className + String.format("%03d", i), codeSourceFolder, testSourceFolder);
         }
     }
-
 
     private void details(String packageName, String className, String codeSourceFolder, String testSourceFolder) throws IOException {
 
@@ -49,7 +56,7 @@ public class Poetry {
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(Test.class)
                 .returns(void.class)
-                .addStatement("int result = $N.add(1,2)", helloWorldField)
+                .addStatement("int result = $N.$N(1,2)", helloWorldField, add)
                 .addStatement("assertThat(result, is(3))")
                 .build();
 
@@ -79,8 +86,6 @@ public class Poetry {
                 .addStaticImport(Assert.class, "assertThat")
                 .build();
 
-//        javaFile.writeTo(System.out);
-//        javaTestFile.writeTo(System.out);
         javaFile.writeTo(Paths.get(codeSourceFolder));
         javaTestFile.writeTo(Paths.get(testSourceFolder));
     }
