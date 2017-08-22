@@ -14,7 +14,7 @@ import java.nio.file.Paths;
 public class Poetry {
 
     public static void main(String[] args) throws IOException {
-        if(args.length<4) {
+        if (args.length < 4) {
             System.out.println("Expecting these arguments:");
             System.out.println("- package name");
             System.out.println("- class name");
@@ -33,7 +33,7 @@ public class Poetry {
     }
 
     private void compose(String packageName, String className, String codeSourceFolder, String testSourceFolder) throws IOException {
-        for (int i = 0; i < 10; i++) {
+        for (int i = 10; i < 20; i++) {
             details(packageName, className + String.format("%03d", i), codeSourceFolder, testSourceFolder);
         }
     }
@@ -44,20 +44,24 @@ public class Poetry {
 
         FieldSpec helloWorldField = FieldSpec.builder(helloWorldClass, Introspector.decapitalize(className), Modifier.PRIVATE).build();
 
-        MethodSpec add = MethodSpec.methodBuilder("add")
+        MethodSpec add = MethodSpec.methodBuilder("isPrime")
                 .addModifiers(Modifier.PUBLIC)
-                .returns(int.class)
-                .addParameter(int.class, "a")
-                .addParameter(int.class, "b")
-                .addStatement("return a + b")
+                .returns(boolean.class)
+                .addParameter(double.class, "n")
+                .beginControlFlow("for (int i = 2; 2 * i < n; i++)")
+                .beginControlFlow("if (n % i == 0)")
+                .addStatement("return false")
+                .endControlFlow()
+                .endControlFlow()
+                .addStatement("return true")
                 .build();
 
-        MethodSpec testAdd = MethodSpec.methodBuilder("testAdd")
+        MethodSpec testAdd = MethodSpec.methodBuilder("test104395303isPrime")
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(Test.class)
                 .returns(void.class)
-                .addStatement("int result = $N.$N(1,2)", helloWorldField, add)
-                .addStatement("assertThat(result, is(3))")
+                .addStatement("boolean result = $N.$N(104395303D)", helloWorldField, add)
+                .addStatement("assertThat(result, is(true))")
                 .build();
 
         MethodSpec setUp = MethodSpec.methodBuilder("setUp")
